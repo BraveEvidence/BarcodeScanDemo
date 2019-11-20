@@ -1,24 +1,54 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import QrReader from "react-qr-reader";
+import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <video
+        id="video"
+        width="300"
+        height="200"
+        style={{ border: "1px solid gray" }}
+      ></video>
+
+      <button
+        onClick={() => {
+          const codeReader = new BrowserMultiFormatReader();
+          let selectedDeviceId;
+          codeReader
+            .listVideoInputDevices()
+            .then(videoInputDevices => {
+              selectedDeviceId = videoInputDevices[0].deviceId;
+              console.log(`${selectedDeviceId}`);
+            })
+            .catch(err => console.error(err));
+          codeReader.decodeFromVideoDevice(
+            selectedDeviceId,
+            "video",
+            (result, err) => {
+              if (result) {
+                console.log(`${result} `);
+              }
+              if (err && !(err instanceof NotFoundException)) {
+                console.error(err);
+                document.getElementById("result").textContent = err;
+              }
+            }
+          );
+          console.log(
+            `Started continous decode from camera with id ${selectedDeviceId}`
+          );
+          // codeReader
+          //   .decodeFromVideoDevice(selectedDeviceId, "video")
+          //   .then(result => console.log(result.text))
+          //   .catch(err => console.error(err));
+        }}
+      >
+        Click Me
+      </button>
     </div>
   );
 }
