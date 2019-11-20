@@ -5,6 +5,8 @@ import QrReader from "react-qr-reader";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 
 function App() {
+  const [result, setResult] = useState("");
+
   return (
     <div className="App">
       <video
@@ -30,11 +32,12 @@ function App() {
             "video",
             (result, err) => {
               if (result) {
+                setResult(result);
                 console.log(`${result} `);
               }
               if (err && !(err instanceof NotFoundException)) {
                 console.error(err);
-                document.getElementById("result").textContent = err;
+                setResult(err);
               }
             }
           );
@@ -49,6 +52,7 @@ function App() {
       >
         Click Me
       </button>
+      <p>{result}</p>
     </div>
   );
 }
