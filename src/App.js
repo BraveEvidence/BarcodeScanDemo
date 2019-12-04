@@ -2,10 +2,18 @@ import React, { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import QrReader from "react-qr-reader";
-import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
+import {
+  BrowserMultiFormatReader,
+  NotFoundException,
+  BrowserQRCodeSvgWriter
+} from "@zxing/library";
 
 function App() {
-  const [result, setResult] = useState("");
+  const [barcodeScan, setBarcodeScan] = useState("Pritish");
+
+  const codeWriter = new BrowserQRCodeSvgWriter();
+  const svgElement = codeWriter.write(barcodeScan, 300, 300);
+  const svgHtml = svgElement.outerHTML;
 
   return (
     <div className="App">
@@ -32,27 +40,26 @@ function App() {
             "video",
             (result, err) => {
               if (result) {
-                setResult(result);
-                console.log(`${result} `);
+                alert(result);
+                codeReader.reset();
               }
               if (err && !(err instanceof NotFoundException)) {
-                console.error(err);
-                setResult(err);
+                alert(err);
               }
             }
           );
           console.log(
             `Started continous decode from camera with id ${selectedDeviceId}`
           );
-          // codeReader
-          //   .decodeFromVideoDevice(selectedDeviceId, "video")
-          //   .then(result => console.log(result.text))
-          //   .catch(err => console.error(err));
         }}
       >
         Click Me
       </button>
-      <p>{result}</p>
+
+      <div
+        className="content"
+        dangerouslySetInnerHTML={{ __html: svgHtml }}
+      ></div>
     </div>
   );
 }
